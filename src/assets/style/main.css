@@ -1,0 +1,148 @@
+:root {
+  color-scheme: dark;
+  --bg-color: #28282b;
+  --box-color: #2b2b2b;
+  --bg-overlay: #28282b90;
+  --window-border: #ffffff;
+  --i-line-hover-color: #479e95;
+  --i-line-selected-color: #008477;
+  --extra-inline-color: rgb(255, 132, 132);
+  --intro-color: #bcf9b1;
+  --text-color: hsl(0, 0%, 94%);
+  --link-color: #a7caff;
+  --button-bg: #363636;
+  --button-bg-hover: #505050;
+  --button-bg-active: #2d5452;
+  --notice-color: rgb(255, 193, 193);
+  --annotation-color: #979797;
+  --inverse: 0;
+
+  --narrowing-width: 1100px;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-color: #ffffff;
+  --box-color: #f0f0f0;
+  --bg-overlay: #ffffff90;
+  --window-border: #000000;
+  --i-line-hover-color: #ceffe3;
+  --i-line-selected-color: #aaffcf;
+  --extra-inline-color: rgb(255, 0, 0);
+  --intro-color: rgb(0, 141, 24);
+  --text-color: #28282b;
+  --link-color: #6b87d4;
+  --button-bg: #e4e4e4;
+  --button-bg-hover: #c4c4c4;
+  --button-bg-active: #ade3de;
+  --notice-color: rgb(182, 0, 0);
+  --annotation-color: #999999;
+  --inverse: 80%;
+}
+
+.no-wrap
+{
+  white-space: nowrap;
+}
+
+@font-face {
+  font-family: 'Noto Sans Gothic';
+  src: url('../fonts/NotoSansGothic-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html, body, #app, main
+{
+  height: 100%;
+}
+
+main
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+body
+{
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+*:lang(got-Goth)
+{
+  font-family: 'Noto Sans Gothic', sans-serif;
+}
+
+a
+{
+  color: var(--link-color);
+}
+
+sup
+{
+  vertical-align: top;
+  font-size: 12px;
+}
+
+sub
+{
+  vertical-align: bottom;
+  font-size: 12px;
+}
+
+h1
+{
+  margin: 0;
+}
+
+#header
+{
+  margin-top: 10px;
+}
+
+.header-title
+{
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.header-title a
+{
+  text-decoration: none;
+  color: inherit;
+}
+
+.article
+{
+  width: 1100px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#footer
+{
+  padding: 7px 4px;
+  display: flex;
+  justify-content: space-between;
+  text-align: right;
+  width: 1100px;
+  margin: 0 auto;
+}
+
+@media only screen and (max-width: 1100px) {
+  main
+  {
+    display: block;
+  }
+
+  .article,
+  #footer
+  {
+    width: auto;
+  }
+}

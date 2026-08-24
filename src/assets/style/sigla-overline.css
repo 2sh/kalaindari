@@ -1,0 +1,54 @@
+:root {
+  color-scheme: dark;
+  --overline-color: hsl(0, 0%, 94%);
+  --overline-height: 2px;
+}
+:root[data-theme="light"] {
+  --overline-color: #28282b;
+}
+
+.sigla-overline
+{
+  background-color: inherit;
+  color: inherit;
+  position: relative;
+  text-align: center;
+
+  /* To expand the width of short sigla, such as those with single letters */
+  min-width: 10px;
+  display: inline-block;
+}
+
+.sigla-overline::before
+{
+  display: block;
+  position: absolute;
+  content: "\a0";
+  background-color: var(--overline-color);
+
+  bottom: 1.15em;
+
+  height: var(--overline-height);
+
+  /* To compensate for sides being cut off occasionally */
+  left: -1px;
+  right: -1px;
+  --comp: 1px;
+
+  --short: calc(var(--overline-height) + var(--comp));
+  --ex: calc(var(--overline-height) / 2);
+  --long: calc(var(--short) + var(--ex));
+
+  clip-path: polygon(
+    var(--long) 100%,
+    var(--comp) 100%,
+    var(--comp) 0,
+    var(--short) 0,
+    var(--short) 50%,
+    calc(100% - var(--long)) 0,
+    calc(100% - var(--comp)) 0,
+    calc(100% - var(--comp)) 100%,
+    calc(100% - var(--short)) 100%,
+    calc(100% - var(--short)) 50%
+  );
+}
