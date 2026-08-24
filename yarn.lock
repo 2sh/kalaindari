@@ -833,6 +833,11 @@ arraybuffer.prototype.slice@^1.0.4:
     get-intrinsic "^1.2.6"
     is-array-buffer "^3.0.4"
 
+astronomy-engine@^2.1.19:
+  version "2.1.19"
+  resolved "https://registry.yarnpkg.com/astronomy-engine/-/astronomy-engine-2.1.19.tgz#41b9fd2afb7eba3485e3803cbd9033011f8557af"
+  integrity sha512-8yWKNf7UeNbH458h3sAJ6ZgAjE5jTXp/mNNRFoC20j2SHwZIjAQeEsBB2Q3uCFRaTCCJRv33K2XhkhZQMXoX6w==
+
 async-function@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/async-function/-/async-function-1.0.0.tgz#509c9fca60eaf85034c6829838188e4e4c8ffb2b"

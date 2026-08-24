@@ -5,6 +5,7 @@ import {
   orthodoxEaster
 } from 'date-easter'
 import { addDate } from './tools'
+import { Seasons } from 'astronomy-engine'
 
 
 
@@ -127,14 +128,77 @@ class MethodEasterGregorian extends CachedYearMethod implements ScheduleMethod
 }
 
 
+class MethodJuneSolstice extends CachedYearMethod implements ScheduleMethod
+{
+  apply(start: Date, end: Date, args: string)
+  {
+    const self = this
+    return getYears(start, end).map(y =>
+    {
+      return applyCustomArgs(
+        self.applyCache(y, (y) => Seasons(y).jun_solstice.date),
+        args)
+    })
+  }
+}
 
+class MethodDecemberSolstice extends CachedYearMethod implements ScheduleMethod
+{
+  apply(start: Date, end: Date, args: string)
+  {
+    const self = this
+    return getYears(start, end).map(y =>
+    {
+      return applyCustomArgs(
+        self.applyCache(y, (y) => Seasons(y).dec_solstice.date),
+        args)
+    })
+  }
+}
+
+class MethodMarchEquinox extends CachedYearMethod implements ScheduleMethod
+{
+  apply(start: Date, end: Date, args: string)
+  {
+    const self = this
+    return getYears(start, end).map(y =>
+    {
+      return applyCustomArgs(
+        self.applyCache(y, (y) => Seasons(y).mar_equinox.date),
+        args)
+    })
+  }
+}
+
+class MethodSeptemberEquinox extends CachedYearMethod implements ScheduleMethod
+{
+  apply(start: Date, end: Date, args: string)
+  {
+    const self = this
+    return getYears(start, end).map(y =>
+    {
+      return applyCustomArgs(
+        self.applyCache(y, (y) => Seasons(y).sep_equinox.date),
+        args)
+    })
+  }
+}
 
 const methods: {[name: string]: ScheduleMethod} = {
 //  'rrule': new MethodRRule(),
+
   'yearly': new MethodYearly(),
+
   'easter_orthodox': new MethodEasterOrthodox(),
   'easter_gregorian': new MethodEasterGregorian(),
+
+  'jun_solstice': new MethodJuneSolstice(),
+  'dec_solstice': new MethodDecemberSolstice(),
+
+  'mar_equinox': new MethodMarchEquinox(),
+  'sep_equinox': new MethodSeptemberEquinox(),
 }
+
 
 export function getDatesFromMethod(method: string, args: string, start: Date, end: Date)
 {

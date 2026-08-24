@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^14.2.1",
+    "astronomy-engine": "^2.1.19",
     "date-easter": "^1.0.3",
     "i18next": "^25.8.13",
     "i18next-vue": "^5.4.0",
