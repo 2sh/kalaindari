@@ -192,6 +192,12 @@
   align-items: flex-start;
 }
 
+.calendar-grid-day .header
+{
+  display: flex;
+  flex-direction: row;
+}
+
 .calendar-grid-day .date
 {
   padding: 3px;
@@ -199,6 +205,16 @@
   margin-left: 3px;
   border-radius: 40%;
   font-size: 12px;
+}
+
+.calendar-grid-day .moon
+{
+  display: none;
+}
+
+.calendar-grid-day.is-full-moon .moon
+{
+  display: block;
 }
 
 .calendar-grid-day.not-grid-month

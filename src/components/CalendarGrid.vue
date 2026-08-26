@@ -10,6 +10,7 @@ import type {
 import CalendarGridDay from "@/components/CalendarGridDay.vue"
 import { calendarEventsKey, highlightedEventKey, optionsKey, toRepStringKey, toRepValueKey } from '@/symbols'
 import { computed, inject, type Ref } from 'vue'
+import { getLunarMonthsInRange } from '@/lunar'
 
 const tgv = inject(toRepValueKey)!
 const tgt = inject(toRepStringKey)!
@@ -31,6 +32,21 @@ function getWeeksInMonth()
   d.setUTCMonth(d.getUTCMonth()+1)
   return Math.ceil(diffInDays(firstOfGrid.value, d) / 7)
 }
+
+const weeksInGrid = computed(() =>
+{
+  return props.hideUnusedWeeks ? getWeeksInMonth() : 6
+})
+
+const lastOfGrid = computed(() =>
+{
+  return addDate(firstOfGrid.value, 7*weeksInGrid.value)
+})
+
+const lunarMonths = computed(() =>
+{
+  return getLunarMonthsInRange(firstOfGrid.value, lastOfGrid.value)
+})
 
 const calendarEvents = inject(calendarEventsKey) as Ref<CalendarEvent[]>
 
@@ -83,15 +99,6 @@ function getDayEvents(date: Date, gridPosition: Position)
 
   calendarEvents.value.forEach(event =>
   {
-    if (event.title == "Niketa sa Guta")
-    {
-      console.log(event.dtfrom)
-      console.log(date)
-      console.log(event.dtto)
-      console.log(event.dtfrom <= date && date <= event.dtto)
-      console.log(sameDay(event.dtfrom, date))
-    }
-
     if (!(event.dtfrom <= date && date <= event.dtto)) return
 
     const isStart = sameDay(event.dtfrom, date)
@@ -118,6 +125,24 @@ function getDayEvents(date: Date, gridPosition: Position)
   return events
 }
 
+function getWeek(y: number)
+{
+  const days = []
+  for (let x=0; x<7; x++)
+  {
+    days.push({
+      position: {x, y},
+      date: addDate(firstOfGrid.value, ((y*7)+x)),
+    })
+  }
+  return days
+}
+
+function checkIfFullMoon(date: Date)
+{
+  return lunarMonths.value.some(l => sameDay(l.start, date))
+}
+
 </script>
 
 <template>
@@ -134,14 +159,16 @@ function getDayEvents(date: Date, gridPosition: Position)
         <span class="long">{{ $t(`weekdays_${options.weekdayNameSet}.${addDate(firstOfGrid, d).getUTCDay()}.long`) }}</span>
       </div>
     </div>
-    <div class="calendar-grid-week" v-for="(_, y) in (props.hideUnusedWeeks ? getWeeksInMonth() : 6)">
-      <template v-for="(_, x) in 7">
+    <div class="calendar-grid-week" v-for="(_, y) in weeksInGrid">
+      <template v-for="day in getWeek(y)">
         <CalendarGridDay
+          :class="{
+            'is-full-moon': checkIfFullMoon(day.date),
+          }"
           :gridMonth="props.gridMonth"
-          :date="addDate(firstOfGrid, ((y*7)+x))"
-          :hideDetailsOnOuterMonth="props.hideExtraDays"
-          v-slot="{ date }">
-          <template v-for="event in getDayEvents(date, {x, y})">
+          :date="day.date"
+          :hideDetailsOnOuterMonth="props.hideExtraDays">
+          <template v-for="event in getDayEvents(day.date, day.position)">
             <div
             :class='[
               "event",

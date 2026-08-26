@@ -4,8 +4,9 @@ import {
   gregorianEaster,
   orthodoxEaster
 } from 'date-easter'
-import { addDate } from './tools'
+import { addDate, sameDay } from './tools'
 import { Seasons } from 'astronomy-engine'
+import { getLunarMonthsOfYear, type LunarMonth } from './lunar'
 
 
 
@@ -59,13 +60,13 @@ interface ScheduleMethod
   apply(start: Date, end: Date, args: string): Date[]
 }
 
-type YearCache = { [year: number]: Date }
+type YearCache<T> = { [year: number]: T }
 
-class CachedYearMethod
+class CachedYearMethod<T>
 {
-  private cache: YearCache = {}
+  private cache: YearCache<T> = {}
 
-  protected applyCache(year: number, f: (y: number) => Date)
+  protected applyCache(year: number, f: (y: number) => T)
   {
     const cachedDate = this.cache[year]
     if (cachedDate) return cachedDate
@@ -87,19 +88,36 @@ class MethodRRule implements ScheduleMethod
 }
 */
 
+function argsToMonthDate(args: string): [number, number]
+{
+  const [m, d] = args.split('-').map(n => parseInt(n))
+  if (m && d)
+    return [m, d]
+  return [1, 1]
+}
+
+function toDay(date: Date)
+{
+  return new Date(Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate()
+  ))
+}
+
 class MethodYearly implements ScheduleMethod
 {
   apply(start: Date, end: Date, args: string)
   {
     return getYears(start, end).map(y =>
     {
-      const [m, d] = args.split('-').map(n => parseInt(n))
+      const [m, d] = argsToMonthDate(args)
       return new Date(Date.UTC(y, m!-1, d!))
     })
   }
 }
 
-class MethodEasterOrthodox extends CachedYearMethod implements ScheduleMethod
+class MethodEasterOrthodox extends CachedYearMethod<Date> implements ScheduleMethod
 {
   apply(start: Date, end: Date, args: string)
   {
@@ -113,7 +131,7 @@ class MethodEasterOrthodox extends CachedYearMethod implements ScheduleMethod
   }
 }
 
-class MethodEasterGregorian extends CachedYearMethod implements ScheduleMethod
+class MethodEasterGregorian extends CachedYearMethod<Date> implements ScheduleMethod
 {
   apply(start: Date, end: Date, args: string)
   {
@@ -128,7 +146,7 @@ class MethodEasterGregorian extends CachedYearMethod implements ScheduleMethod
 }
 
 
-class MethodJuneSolstice extends CachedYearMethod implements ScheduleMethod
+class MethodJuneSolstice extends CachedYearMethod<Date> implements ScheduleMethod
 {
   apply(start: Date, end: Date, args: string)
   {
@@ -136,13 +154,13 @@ class MethodJuneSolstice extends CachedYearMethod implements ScheduleMethod
     return getYears(start, end).map(y =>
     {
       return applyCustomArgs(
-        self.applyCache(y, (y) => Seasons(y).jun_solstice.date),
+        self.applyCache(y, (y) => toDay(Seasons(y).jun_solstice.date)),
         args)
     })
   }
 }
 
-class MethodDecemberSolstice extends CachedYearMethod implements ScheduleMethod
+class MethodDecemberSolstice extends CachedYearMethod<Date> implements ScheduleMethod
 {
   apply(start: Date, end: Date, args: string)
   {
@@ -150,13 +168,13 @@ class MethodDecemberSolstice extends CachedYearMethod implements ScheduleMethod
     return getYears(start, end).map(y =>
     {
       return applyCustomArgs(
-        self.applyCache(y, (y) => Seasons(y).dec_solstice.date),
+        self.applyCache(y, (y) => toDay(Seasons(y).dec_solstice.date)),
         args)
     })
   }
 }
 
-class MethodMarchEquinox extends CachedYearMethod implements ScheduleMethod
+class MethodMarchEquinox extends CachedYearMethod<Date> implements ScheduleMethod
 {
   apply(start: Date, end: Date, args: string)
   {
@@ -164,13 +182,13 @@ class MethodMarchEquinox extends CachedYearMethod implements ScheduleMethod
     return getYears(start, end).map(y =>
     {
       return applyCustomArgs(
-        self.applyCache(y, (y) => Seasons(y).mar_equinox.date),
+        self.applyCache(y, (y) => toDay(Seasons(y).mar_equinox.date)),
         args)
     })
   }
 }
 
-class MethodSeptemberEquinox extends CachedYearMethod implements ScheduleMethod
+class MethodSeptemberEquinox extends CachedYearMethod<Date> implements ScheduleMethod
 {
   apply(start: Date, end: Date, args: string)
   {
@@ -178,9 +196,38 @@ class MethodSeptemberEquinox extends CachedYearMethod implements ScheduleMethod
     return getYears(start, end).map(y =>
     {
       return applyCustomArgs(
-        self.applyCache(y, (y) => Seasons(y).sep_equinox.date),
+        self.applyCache(y, (y) => toDay(Seasons(y).sep_equinox.date)),
         args)
     })
+  }
+}
+
+const leapMonthIndex = 6
+
+class MethodLunarYearly extends CachedYearMethod<LunarMonth[]> implements ScheduleMethod
+{
+  apply(start: Date, end: Date, args: string)
+  {
+    const self = this
+    const dates: Date[] = []
+    const years = getYears(start, end)
+    years.push(years.at(-1)!+1)
+    years.forEach(y =>
+    {
+      const [m, d] = argsToMonthDate(args)
+      const lunarMonths = self.applyCache(y, y => getLunarMonthsOfYear(y))
+
+      const lunarMonth = lunarMonths.find(lunarMonth =>
+      {
+        const leapShift = !lunarMonth.isLeapYear && leapMonthIndex <= lunarMonth.index ? 1 : 0
+        return m == (lunarMonth.index + leapShift) + 1
+      })
+      if (!lunarMonth) return
+      const date = addDate(lunarMonth.start, d-1)
+      if (!(date < lunarMonth.end)) return
+      dates.push(date)
+    })
+    return dates
   }
 }
 
@@ -188,6 +235,7 @@ const methods: {[name: string]: ScheduleMethod} = {
 //  'rrule': new MethodRRule(),
 
   'yearly': new MethodYearly(),
+  'lunar_yearly': new MethodLunarYearly(),
 
   'easter_orthodox': new MethodEasterOrthodox(),
   'easter_gregorian': new MethodEasterGregorian(),
