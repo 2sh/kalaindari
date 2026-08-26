@@ -60,7 +60,7 @@ export function getLunarMonthsOfYear(year: number): LunarMonth[]
     {
       monthEnds.push(date)
     }
-    if (dateTo < date) break
+    if (!(date < dateTo)) break
     monthStarts.push(date)
     date.setUTCDate(date.getUTCDate()+1)
   }
