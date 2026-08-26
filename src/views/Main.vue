@@ -4,7 +4,6 @@ import type {
   Calendar,
   CalendarData,
   CalendarEvent,
-  CalendarMap,
   CalendarView,
   EventData,
   MonthCalendarMode,
@@ -41,7 +40,7 @@ import { addMonth, sameDay } from '@/tools'
 import { fromLatin } from '@/transliterate'
 
 import { getDatesFromMethod } from '@/event'
-import { getLunarDate } from '@/lunar'
+import { getLunarYear, toGoldenNumber } from '@/lunar'
 
 const { i18next, t } = useTranslation()
 
@@ -399,7 +398,8 @@ function processEvent(eventData: EventData): CalendarEvent[]
     return {
       title: eventData.title,
       description: eventData.description
-        .replaceAll('<GN>', () => getLunarDate(dtfrom)!.goldenNumber.toString()),
+        .replaceAll('<GN>', () =>
+          toGoldenNumber(getLunarYear(dtfrom)).toString()),
       calendar: calendarObject,
       dtfrom,
       dtto,

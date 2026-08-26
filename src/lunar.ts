@@ -26,10 +26,20 @@ function toDayDate(date: Date)
   ))
 }
 
-export function getLunarDate(date: Date)
+export function toGoldenNumber(year: number)
+{
+  return (year%19)+1
+}
+
+export function getLunarYear(date: Date)
 {
   const solstice = Seasons(date.getUTCFullYear()).dec_solstice.date
-  const year =  date.getUTCFullYear() + (date < solstice ? 0 : 1)
+  return date.getUTCFullYear() + (date < solstice ? 0 : 1)
+}
+
+export function getLunarDate(date: Date)
+{
+  const year =  getLunarYear(date)
 
   const lunarMonth = getLunarMonthsOfYear(year).find(lm => lm.start <= date)
   if (!lunarMonth) return null
@@ -37,7 +47,7 @@ export function getLunarDate(date: Date)
     year,
     month: lunarMonth.index+1,
     date: diffInDays(lunarMonth.start, date)+1,
-    goldenNumber: (year%19)+1
+    goldenNumber: toGoldenNumber(year)
   }
 }
 
