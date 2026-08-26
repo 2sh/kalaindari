@@ -31,7 +31,7 @@ export function getLunarDate(date: Date)
   const solstice = Seasons(date.getUTCFullYear()).dec_solstice.date
   const year =  date.getUTCFullYear() + (date < solstice ? 0 : 1)
 
-  const lunarMonth = getLunarMonthsOfYear(year).find(lm => date < lm.end)
+  const lunarMonth = getLunarMonthsOfYear(year).find(lm => lm.start <= date)
   if (!lunarMonth) return null
   return {
     year,
