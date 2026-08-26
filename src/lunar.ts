@@ -43,8 +43,8 @@ export function getLunarDate(date: Date)
 
 export function getLunarMonthsOfYear(year: number): LunarMonth[]
 {
-  const dateFrom = toDayDate(Seasons(year-1).dec_solstice.date)
-  const dateTo = toDayDate(Seasons(year).dec_solstice.date)
+  const dateFrom = Seasons(year-1).dec_solstice.date
+  const dateTo = Seasons(year).dec_solstice.date
 
   let date: Date = dateFrom
 
