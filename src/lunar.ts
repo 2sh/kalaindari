@@ -1,4 +1,5 @@
 import { Seasons, SearchMoonPhase } from 'astronomy-engine'
+import { diffInDays } from './tools'
 
 
 /*
@@ -16,10 +17,34 @@ export type LunarMonth = {
   isLeapYear: boolean
 }
 
+function toDayDate(date: Date)
+{
+  return new Date(Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate()
+  ))
+}
+
+export function getLunarDate(date: Date)
+{
+  const solstice = Seasons(date.getUTCFullYear()).dec_solstice.date
+  const year =  date.getUTCFullYear() + (date < solstice ? 0 : 1)
+
+  const lunarMonth = getLunarMonthsOfYear(year).find(lm => date < lm.end)
+  if (!lunarMonth) return null
+  return {
+    year,
+    month: lunarMonth.index+1,
+    date: diffInDays(lunarMonth.start, date)+1,
+    goldenNumber: (year%19)+1
+  }
+}
+
 export function getLunarMonthsOfYear(year: number): LunarMonth[]
 {
-  const dateFrom = Seasons(year-1).dec_solstice.date
-  const dateTo = Seasons(year).dec_solstice.date
+  const dateFrom = toDayDate(Seasons(year-1).dec_solstice.date)
+  const dateTo = toDayDate(Seasons(year).dec_solstice.date)
 
   let date: Date = dateFrom
 
@@ -37,26 +62,23 @@ export function getLunarMonthsOfYear(year: number): LunarMonth[]
     }
     if (dateTo < date) break
     monthStarts.push(date)
-    date.setUTCMilliseconds(date.getUTCMilliseconds()+1)
+    date.setUTCDate(date.getUTCDate()+1)
   }
 
-  return monthStarts.map((start, index) =>
+  const lunarMonths = monthStarts.map((start, index) =>
   {
     const end = monthEnds[index]!
     return {
-      start: new Date(Date.UTC(
-        start.getUTCFullYear(),
-        start.getUTCMonth(),
-        start.getUTCDate())),
-      end: new Date(Date.UTC(
-        end.getUTCFullYear(),
-        end.getUTCMonth(),
-        end.getUTCDate())),
+      start: toDayDate(start),
+      end: toDayDate(end),
       year,
       index,
       isLeapYear: monthStarts.length == 13
     }
   })
+
+  console.log(lunarMonths)
+  return lunarMonths
 }
 
 export function getLunarMonthsInRange(dateFrom: Date, dateTo: Date)
