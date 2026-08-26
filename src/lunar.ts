@@ -77,7 +77,6 @@ export function getLunarMonthsOfYear(year: number): LunarMonth[]
     }
   })
 
-  console.log(lunarMonths)
   return lunarMonths
 }
 
