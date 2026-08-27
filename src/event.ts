@@ -4,7 +4,7 @@ import {
   gregorianEaster,
   orthodoxEaster
 } from 'date-easter'
-import { addDate, sameDay } from './tools'
+import { modDate } from './tools'
 import { Seasons } from 'astronomy-engine'
 import { getLunarMonthsOfYear, type LunarMonth } from './lunar'
 
@@ -50,7 +50,7 @@ function applyCustomArgs(date: Date, a: string)
   if (typeof args !== 'object' || args === null) return output
 
   if (args.shift)
-    output = addDate(date, args.shift)
+    output = modDate(date, {_d: args.shift})
 
   return output
 }
@@ -223,7 +223,8 @@ class MethodLunarYearly extends CachedYearMethod<LunarMonth[]> implements Schedu
         return m == (lunarMonth.index + leapShift) + 1
       })
       if (!lunarMonth) return
-      const date = addDate(lunarMonth.start, d-1)
+      console.log('hey')
+      const date = modDate(lunarMonth.start, {_d: d-1})
       if (!(date < lunarMonth.end)) return
       dates.push(date)
     })

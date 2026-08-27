@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { sameDay, sameMonth } from '@/tools'
+import { sameTime } from '@/tools'
 import type {
   PropsGridDay,
 } from '../types'
@@ -13,13 +13,13 @@ const currentDate = new Date()
 const tgv = inject(toRepValueKey)!
 const props = defineProps<PropsGridDay>()
 
-const notGridMonth = computed(() => !sameMonth(props.date, props.gridMonth))
+const notGridMonth = computed(() => !sameTime(props.date, props.gridMonth, 'm'))
 
 </script>
 
 <template>
 <div :class="['calendar-grid-day', {
-  'current': sameDay(props.date, currentDate),
+  'current': sameTime(props.date, currentDate, 'm'),
   'not-grid-month': notGridMonth
     }]">
   <div class="cell-border"></div>

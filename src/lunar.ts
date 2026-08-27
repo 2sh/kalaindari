@@ -1,5 +1,5 @@
 import { Seasons, SearchMoonPhase } from 'astronomy-engine'
-import { diffInDays } from './tools'
+import { modDate, diffInDays } from './tools'
 
 
 /*
@@ -15,15 +15,6 @@ export type LunarMonth = {
   year: number,
   index: number,
   isLeapYear: boolean
-}
-
-function toDayDate(date: Date)
-{
-  return new Date(Date.UTC(
-    date.getUTCFullYear(),
-    date.getUTCMonth(),
-    date.getUTCDate()
-  ))
 }
 
 export function toGoldenNumber(year: number)
@@ -72,15 +63,15 @@ export function getLunarMonthsOfYear(year: number): LunarMonth[]
     }
     if (!(date < dateTo)) break
     monthStarts.push(date)
-    date.setUTCDate(date.getUTCDate()+1)
+    date = modDate(date, {_d: 1})
   }
 
   const lunarMonths = monthStarts.map((start, index) =>
   {
     const end = monthEnds[index]!
     return {
-      start: toDayDate(start),
-      end: toDayDate(end),
+      start: modDate(start, {h: null}),
+      end: modDate(end, {h: null}),
       year,
       index,
       isLeapYear: monthStarts.length == 13

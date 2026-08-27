@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { addDate, diffInDays, sameDay } from '@/tools'
+import { modDate, diffInDays, sameTime } from '@/tools'
 import type {
   CalendarEvent,
   Options,
@@ -40,7 +40,7 @@ const weeksInGrid = computed(() =>
 
 const lastOfGrid = computed(() =>
 {
-  return addDate(firstOfGrid.value, 7*weeksInGrid.value)
+  return modDate(firstOfGrid.value, {_d: 7*weeksInGrid.value})
 })
 
 const lunarMonths = computed(() =>
@@ -101,7 +101,7 @@ function getDayEvents(date: Date, gridPosition: Position)
   {
     if (!(event.dtfrom <= date && date <= event.dtto)) return
 
-    const isStart = sameDay(event.dtfrom, date)
+    const isStart = sameTime(event.dtfrom, date, 'd')
     const isStartOfWeek = gridPosition.x == 0
 
     if (!(isStart || isStartOfWeek)) return
@@ -132,7 +132,7 @@ function getWeek(y: number)
   {
     days.push({
       position: {x, y},
-      date: addDate(firstOfGrid.value, ((y*7)+x)),
+      date: modDate(firstOfGrid.value, {_d: ((y*7)+x)}),
     })
   }
   return days
@@ -140,7 +140,7 @@ function getWeek(y: number)
 
 function checkIfFullMoon(date: Date)
 {
-  return lunarMonths.value.some(l => sameDay(l.start, date))
+  return lunarMonths.value.some(l => sameTime(l.start, date, 'd'))
 }
 
 </script>
@@ -155,8 +155,8 @@ function checkIfFullMoon(date: Date)
     <div class="calendar-grid-day-titles">
       <div class="calendar-grid-day-title" v-for="(_, d) in 7">
         <div class="cell-border"></div>
-        <span class="short">{{ $t(`weekdays_${options.weekdayNameSet}.${addDate(firstOfGrid, d).getUTCDay()}.short`) }}</span>
-        <span class="long">{{ $t(`weekdays_${options.weekdayNameSet}.${addDate(firstOfGrid, d).getUTCDay()}.long`) }}</span>
+        <span class="short">{{ $t(`weekdays_${options.weekdayNameSet}.${modDate(firstOfGrid, {_d: d}).getUTCDay()}.short`) }}</span>
+        <span class="long">{{ $t(`weekdays_${options.weekdayNameSet}.${modDate(firstOfGrid, {_d: d}).getUTCDay()}.long`) }}</span>
       </div>
     </div>
     <div class="calendar-grid-week" v-for="(_, y) in weeksInGrid">

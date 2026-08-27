@@ -4,7 +4,7 @@ import type { CalendarEvent, Options, PropsList } from '@/types'
 import { calendarEventsKey, highlightedEventKey, optionsKey, toRepStringKey, toRepValueKey } from '@/symbols'
 import { computed, inject, type Ref } from 'vue'
 import { useTranslation } from "i18next-vue"
-import { getDaysInMonth, sameDay } from '@/tools'
+import { getDaysInMonth, sameTime } from '@/tools'
 
 const { t } = useTranslation()
 
@@ -69,7 +69,7 @@ function getDays()
     date.setUTCDate(date.getUTCDate()+i)
 
     const events = getEvents(date)
-    const isToday = sameDay(date, new Date())
+    const isToday = sameTime(date, new Date(), 'd')
 
     if (props.compact && !(isToday || events.length)) continue
 

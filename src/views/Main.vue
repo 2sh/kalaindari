@@ -36,7 +36,7 @@ import { addOverlineHtml, toGothicValue } from '@/gothic_tools'
 import CalendarGrid from "@/components/CalendarGrid.vue"
 import CalendarList from "@/components/CalendarList.vue"
 import { calendarEventsKey, excludedCalendarsKey, highlightedEventKey, optionsKey, toRepStringKey, toRepValueKey } from "@/symbols"
-import { addMonth, sameDay } from '@/tools'
+import { modDate, sameTime } from '@/tools'
 import { fromLatin } from '@/transliterate'
 
 import { getDatesFromMethod } from '@/event'
@@ -204,46 +204,40 @@ const calendarView = ref<CalendarView>(defaultCalendarView)
 const referenceDate = ref(new Date())
 const viewDate = computed(() =>
 {
-  const newDate = new Date(referenceDate.value)
-
-  newDate.setUTCHours(0)
-  newDate.setUTCMinutes(0)
-  newDate.setUTCSeconds(0)
-  newDate.setUTCMilliseconds(0)
   if (calendarView.value == "month")
   {
-    newDate.setUTCDate(1)
+    return modDate(referenceDate.value, {d: null})
   }
   else if (calendarView.value == "year")
   {
-    newDate.setUTCDate(1)
-    newDate.setUTCMonth(0)
+    return modDate(referenceDate.value, {m: null})
   }
   else if (calendarView.value == "week")
   {
+    const newDate = modDate(referenceDate.value, {h: null})
     newDate.setUTCDate(newDate.getUTCDate()
       - ((newDate.getUTCDay() - options.value.firstWeekday + 7) % 7))
+    return newDate
   }
 
-  return newDate
+  return referenceDate.value
 })
 
 const viewEndDate = computed(() =>
 {
-  const newDate = new Date(viewDate.value)
   if (calendarView.value == "month")
   {
-    newDate.setUTCMonth(newDate.getUTCMonth()+1)
+    return modDate(viewDate.value, {_m: 1})
   }
   else if (calendarView.value == "year")
   {
-    newDate.setUTCFullYear(newDate.getUTCFullYear()+1)
+    return modDate(viewDate.value, {_y: 1})
   }
   else if (calendarView.value == "week")
   {
-    newDate.setUTCDate(newDate.getUTCDate()+7)
+    return modDate(viewDate.value, {_d: 7})
   }
-  return newDate
+  return viewDate.value
 })
 
 
@@ -290,7 +284,7 @@ watch(() => route.params.date, () =>
 function setParams(view: CalendarView, date: Date)
 {
   let dateString = ''
-  const isToday = sameDay(date, new Date())
+  const isToday = sameTime(date, new Date(), 'd')
   if (!isToday)
   {
     const y = date.getUTCFullYear()
@@ -483,13 +477,13 @@ watch(excludedCalendars, processCalendarData)
           </div>
           <template v-for="(_, m) in 12">
             <CalendarList v-if="displayListView"
-              :start="addMonth(viewDate, m)"
+              :start="modDate(viewDate, {_m: m})"
               mode="month"
               :compact="isCompactListView"
               :displayYearInTitle="false"></CalendarList>
             <CalendarGrid v-else
               :displayYearInTitle="false"
-              :grid-month="addMonth(viewDate, m)"
+              :grid-month="modDate(viewDate, {_m: m})"
               :hide-extra-days="true"
               :hide-unused-weeks="true"></CalendarGrid>
           </template>
