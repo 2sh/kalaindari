@@ -294,18 +294,18 @@
   flex-direction: row;
   gap: 10px;
   padding: 5px;
-  border-bottom: 1px solid var(--calendar-list-day-seperator-color);
+  border-top: 1px solid var(--calendar-list-day-seperator-color);
   min-height: 27px;
 }
 
-.calendar-list .day.dom-6
+.calendar-list .day.is-new-week
 {
   border-color: var(--calendar-list-week-seperator-color);
 }
 
-.calendar-list .day:last-child
+.calendar-list .day:first-child
 {
-  border-bottom: 0;
+  border-top: 0;
 }
 
 

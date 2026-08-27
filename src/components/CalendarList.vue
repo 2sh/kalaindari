@@ -56,6 +56,7 @@ type Day = {
   date: Date,
   isToday: boolean,
   events: CalendarEvent[],
+  isNewWeek: boolean,
 }
 
 function getDays()
@@ -63,6 +64,7 @@ function getDays()
   const output: Day[] = []
   const totalDays = props.mode == 'week' ? 7 :
     props.mode == 'month' ? getDaysInMonth(props.start) : 0
+  let isNewWeek = false
   for (let i=0; i<totalDays; i++)
   {
     const date = new Date(props.start)
@@ -71,13 +73,18 @@ function getDays()
     const events = getEvents(date)
     const isToday = sameTime(date, new Date(), 'd')
 
+    if (date.getUTCDay() == 0)
+      isNewWeek = true
+
     if (props.compact && !(isToday || events.length)) continue
 
     output.push({
       date,
       events,
       isToday,
+      isNewWeek,
     })
+    isNewWeek = false
   }
   return output
 }
@@ -102,7 +109,10 @@ const days = computed(getDays)
   </div>
   <div class="days">
     <div v-for="day in days" :class="['day', 'dom-' + day.date.getUTCDay(),
-      {'current': day.isToday}]" >
+      {
+        'current': day.isToday,
+        'is-new-week': day.isNewWeek,
+      }]" >
       <div class="day-header">
         <div class="day-name">
           <span>{{ t(`weekdays_${options.weekdayNameSet}.${day.date.getUTCDay()}.short`) }}</span>
