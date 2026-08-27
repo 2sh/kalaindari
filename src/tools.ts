@@ -48,9 +48,11 @@ export function modDate(date: Date, mod?: DateMod)
   let S = typeof mod.S == 'number' ? mod.S : date.getUTCMilliseconds()
   if (mod._S) S += mod._S
 
-  const by = units.findIndex(l => mod[l] === null) || 0
-  const args = [y, m, d, h, M, s, S].slice(0, by) as [number]
-  return new Date(Date.UTC(...args))
+  const args = [y, m, d, h, M, s, S]
+
+  const by = units.findIndex(l => mod[l] === null)
+  const slicedArgs = (by >= 0 ? args.slice(0, by) : args) as [number]
+  return new Date(Date.UTC(...slicedArgs))
 }
 
 export function sameTime(d1: Date, d2: Date, unit?: typeof units[number])
