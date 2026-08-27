@@ -19,7 +19,7 @@ const notGridMonth = computed(() => !sameTime(props.date, props.gridMonth, 'm'))
 
 <template>
 <div :class="['calendar-grid-day', {
-  'current': sameTime(props.date, currentDate, 'm'),
+  'current': sameTime(props.date, currentDate, 'd'),
   'not-grid-month': notGridMonth
     }]">
   <div class="cell-border"></div>
