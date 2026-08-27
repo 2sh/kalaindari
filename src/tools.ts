@@ -1,4 +1,9 @@
-const dayInMs = 86400000
+/*
+These functions look a bad smell but it's for performance as they get
+called frequently
+*/
+
+const units = ['y', 'm', 'd', 'h', 'M', 's'] as const
 
 type DateMod = {
   y?: number | null,
@@ -17,8 +22,6 @@ type DateMod = {
   _s?: number,
   _S?: number,
 }
-
-const units = ['y', 'm', 'd', 'h', 'M', 's'] as const
 
 export function modDate(date: Date, mod?: DateMod)
 {
@@ -53,21 +56,29 @@ export function modDate(date: Date, mod?: DateMod)
 export function sameTime(d1: Date, d2: Date, unit?: typeof units[number])
 {
   if (typeof unit == 'undefined') return d1.valueOf() == d2.valueOf()
+
   if (d1.getUTCFullYear() !== d2.getUTCFullYear()) return false
   if (unit == 'y') return true
+
   if (d1.getUTCMonth() !== d2.getUTCMonth()) return false
   if (unit == 'm') return true
+
   if (d1.getUTCDate() !== d2.getUTCDate()) return false
   if (unit == 'd') return true
+
   if (d1.getUTCHours() !== d2.getUTCHours()) return false
   if (unit == 'h') return true
+
   if (d1.getUTCMinutes() !== d2.getUTCMinutes()) return false
   if (unit == 'M') return true
+
   if (d1.getUTCSeconds() !== d2.getUTCSeconds()) return false
   if (unit == 's') return true
+
   return d1.getUTCMilliseconds() === d2.getUTCMilliseconds()
 }
 
+const dayInMs = 86400000
 export function diffInDays(d1: Date, d2: Date)
 {
   return Math.abs((d1.getTime() - d2.getTime()) / dayInMs)
