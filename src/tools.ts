@@ -5,54 +5,65 @@ called frequently
 
 const units = ['y', 'm', 'd', 'h', 'M', 's'] as const
 
-type DateMod = {
-  y?: number | null,
-  m?: number | null,
-  d?: number | null,
-  h?: number | null,
-  M?: number | null,
-  s?: number | null,
-  S?: number | null,
+type ModKey =
+   'y' |  'm' |  'd' |  'h' |  'M' |  's' |  'S' |
+  '_y' | '_m' | '_d' | '_h' | '_M' | '_s' | '_S' |
+  'xy' | 'xm' | 'xd' | 'xh' | 'xM' | 'xs' | 'xD'
 
-  _y?: number,
-  _m?: number,
-  _d?: number,
-  _h?: number,
-  _M?: number,
-  _s?: number,
-  _S?: number,
+type DateModOptions ={
+  [key in ModKey]?: number
 }
 
-export function modDate(date: Date, mod?: DateMod)
+type ModFunction = (date: Date, value: number) => void
+
+const modFunctions: {[key in ModKey]: ModFunction} = {
+  y: (d, v) => d.setUTCFullYear(v),
+  m: (d, v) => d.setUTCMonth(v),
+  d: (d, v) => d.setUTCDate(v),
+  h: (d, v) => d.setUTCHours(v),
+  M: (d, v) => d.setUTCMinutes(v),
+  s: (d, v) => d.setUTCSeconds(v),
+  S: (d, v) => d.setUTCMilliseconds(v),
+
+  _y: (d, v) => d.setUTCFullYear(d.getUTCFullYear()+v),
+  _m: (d, v) => d.setUTCMonth(d.getUTCMonth() + v),
+  _d: (d, v) => d.setUTCDate(d.getUTCDate() + v),
+  _h: (d, v) => d.setUTCHours(d.getUTCHours() + v),
+  _M: (d, v) => d.setUTCMinutes(d.getUTCMinutes() + v),
+  _s: (d, v) => d.setUTCSeconds(d.getUTCSeconds() + v),
+  _S: (d, v) => d.setUTCMilliseconds(d.getUTCMilliseconds() + v),
+
+  xy: (d, v) => {
+    d.setUTCMonth(0, 1)
+    d.setUTCHours(0, 0, 0, 0)
+  },
+  xm: (d, v) => {
+    d.setUTCDate(1)
+    d.setUTCHours(0, 0, 0, 0)
+  },
+  xd: (d, v) => d.setUTCHours(0, 0, 0, 0),
+  xh: (d, v) => d.setUTCMinutes(0, 0, 0),
+  xM: (d, v) => d.setUTCSeconds(0, 0),
+  xs: (d, v) => d.setUTCMilliseconds(0),
+
+  xD: (d, v) => {
+    d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - v + 7) % 7))
+    d.setUTCHours(0, 0, 0, 0)
+  },
+}
+
+export function modDate(date: Date, mod?: DateModOptions, editOriginal=false)
 {
-  if (!mod) return new Date(date)
+  let newDate = editOriginal ? date : new Date(date)
 
-  let y = typeof mod.y == 'number' ? mod.y : date.getUTCFullYear()
-  if (mod._y) y += mod._y
+  for (const [key, value] of Object.entries(mod || {}))
+  {
+    const func = modFunctions[key as ModKey]
+    if (!func) continue
+    func(newDate, value)
+  }
 
-  let m = typeof mod.m == 'number' ? mod.m : date.getUTCMonth()
-  if (mod._m) m += mod._m
-
-  let d = typeof mod.d == 'number' ? mod.d : date.getUTCDate()
-  if (mod._d) d += mod._d
-
-  let h = typeof mod.h == 'number' ? mod.h : date.getUTCHours()
-  if (mod._h) h += mod._h
-
-  let M = typeof mod.M == 'number' ? mod.M : date.getUTCMinutes()
-  if (mod._M) M += mod._M
-
-  let s = typeof mod.s == 'number' ? mod.s : date.getUTCSeconds()
-  if (mod._s) s += mod._s
-
-  let S = typeof mod.S == 'number' ? mod.S : date.getUTCMilliseconds()
-  if (mod._S) S += mod._S
-
-  const args = [y, m, d, h, M, s, S]
-
-  const by = units.findIndex(l => mod[l] === null)
-  const slicedArgs = (by >= 0 ? args.slice(0, by) : args) as [number]
-  return new Date(Date.UTC(...slicedArgs))
+  return newDate
 }
 
 export function sameTime(d1: Date, d2: Date, unit?: typeof units[number])

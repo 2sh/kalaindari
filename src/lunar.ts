@@ -70,8 +70,8 @@ export function getLunarMonthsOfYear(year: number): LunarMonth[]
   {
     const end = monthEnds[index]!
     return {
-      start: modDate(start, {h: null}),
-      end: modDate(end, {h: null}),
+      start: modDate(start, {xd: 0}),
+      end: modDate(end, {xd: 0}),
       year,
       index,
       isLeapYear: monthStarts.length == 13

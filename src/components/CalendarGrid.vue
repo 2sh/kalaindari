@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { modDate, diffInDays, sameTime, getFirstDayOfWeek, getNumberOfWeeksInMonth } from '@/tools'
+import { modDate, diffInDays, sameTime, getNumberOfWeeksInMonth } from '@/tools'
 import type {
   CalendarEvent,
   Options,
@@ -20,7 +20,7 @@ const options = inject(optionsKey) as Ref<Options>
 const props = defineProps<PropsGrid>()
 
 const firstOfGrid = computed(() =>
-  getFirstDayOfWeek(props.gridMonth, options.value.firstWeekday))
+  modDate(props.gridMonth, { xD: options.value.firstWeekday }))
 
 const weeksInGrid = computed(() =>
 {

@@ -36,7 +36,7 @@ import { addOverlineHtml, toGothicValue } from '@/gothic_tools'
 import CalendarGrid from "@/components/CalendarGrid.vue"
 import CalendarList from "@/components/CalendarList.vue"
 import { calendarEventsKey, excludedCalendarsKey, highlightedEventKey, optionsKey, toRepStringKey, toRepValueKey } from "@/symbols"
-import { getFirstDayOfWeek, modDate, sameTime } from '@/tools'
+import { modDate, sameTime } from '@/tools'
 import { fromLatin } from '@/transliterate'
 
 import { getDatesFromMethod } from '@/event'
@@ -206,17 +206,15 @@ const viewDate = computed(() =>
 {
   if (calendarView.value == "month")
   {
-    return modDate(referenceDate.value, {d: null})
+    return modDate(referenceDate.value, { xm: 0 })
   }
   else if (calendarView.value == "year")
   {
-    return modDate(referenceDate.value, {m: null})
+    return modDate(referenceDate.value, { xy: 0 })
   }
   else if (calendarView.value == "week")
   {
-    return modDate(
-      getFirstDayOfWeek(referenceDate.value, options.value.firstWeekday),
-      {h: null})
+    return modDate(referenceDate.value, { xD: options.value.firstWeekday })
   }
 
   return referenceDate.value
@@ -324,17 +322,16 @@ function goDirection(value: number)
 {
   if (calendarView.value == "month")
   {
-    setDate(modDate(referenceDate.value, { d: null, _m: value }))
+    setDate(modDate(referenceDate.value, { _m: value, xm: 0 }))
   }
   else if (calendarView.value == "year")
   {
-    setDate(modDate(referenceDate.value, { m: null, _y: value }))
+    setDate(modDate(referenceDate.value, { _y: value, xy: 0 }))
   }
   else if (calendarView.value == "week")
   {
-    setDate(modDate(
-      getFirstDayOfWeek(referenceDate.value, options.value.firstWeekday),
-      { h: null, _d: 7 * value }))
+    setDate(modDate(referenceDate.value,
+      { xD: options.value.firstWeekday, _d: 7 * value }))
   }
 }
 
