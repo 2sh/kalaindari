@@ -207,16 +207,6 @@
   font-size: 12px;
 }
 
-.calendar-grid-day .moon
-{
-  display: none;
-}
-
-.calendar-grid-day.is-full-moon .moon
-{
-  display: block;
-}
-
 .calendar-grid-day.not-grid-month
 {
   background-color: var(--calendar-not-grid-month-bg);
