@@ -146,6 +146,40 @@ class MethodEasterGregorian extends CachedYearMethod<Date> implements ScheduleMe
 }
 
 
+function getYearDecSolsticeDiff(y: number): [Date, number]
+{
+  const s1 = Seasons(y-1).dec_solstice.date
+  const s2 = Seasons(y).dec_solstice.date
+  return [s1, s2.valueOf()-s1.valueOf()]
+}
+
+function dateFromSolsticeAngle(date: Date, diff: number, angle: number)
+{
+  const secsFromSolstice = (angle/360) * diff
+  return toDay(modDate(date, {_S: secsFromSolstice}))
+}
+
+
+class MethodSunPosition extends CachedYearMethod<[Date, number]> implements ScheduleMethod
+{
+  apply(start: Date, end: Date, args: string)
+  {
+    const self = this
+    const angle = parseInt(args)
+
+    const dates = getYears(start, end).map(y =>
+    {
+      const [sol1, yearDiff1] = self.applyCache(y, getYearDecSolsticeDiff)
+      const target = dateFromSolsticeAngle(sol1, yearDiff1, angle)
+      if (target.getUTCFullYear() == y) return target
+      const [sol2, yearDiff2] = self.applyCache(y+1, getYearDecSolsticeDiff)
+      return dateFromSolsticeAngle(sol2, yearDiff2, angle)
+    })
+    return dates
+  }
+}
+
+
 class MethodJuneSolstice extends CachedYearMethod<Date> implements ScheduleMethod
 {
   apply(start: Date, end: Date, args: string)
@@ -245,6 +279,8 @@ const methods: {[name: string]: ScheduleMethod} = {
 
   'mar_equinox': new MethodMarchEquinox(),
   'sep_equinox': new MethodSeptemberEquinox(),
+
+  'sun_position': new MethodSunPosition(),
 }
 
 
