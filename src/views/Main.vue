@@ -36,7 +36,7 @@ import { addOverlineHtml, toGothicValue } from '@/gothic_tools'
 import CalendarGrid from "@/components/CalendarGrid.vue"
 import CalendarList from "@/components/CalendarList.vue"
 import { calendarEventsKey, excludedCalendarsKey, highlightedEventKey, optionsKey, toRepStringKey, toRepValueKey } from "@/symbols"
-import { modDate, sameTime } from '@/tools'
+import { getFirstDayOfWeek, modDate, sameTime } from '@/tools'
 import { fromLatin } from '@/transliterate'
 
 import { getDatesFromMethod } from '@/event'
@@ -76,12 +76,12 @@ const isGothicNumerals = useLocalStorage('gothic_numeral_mode', true)
 const monthCalendarMode = useLocalStorage<MonthCalendarMode>('month_calendar_mode', 'auto')
 const isCompactListView = useLocalStorage('is_compact_list_view', false)
 const weekdayNameSet = useLocalStorage<WeekdayNameSet>('weekday_name_set', 'germanic')
+const firstWeekday = useLocalStorage('first_weekday', 0)
 
 const excludedCalendars = useLocalStorage<string[]>('excluded_calendars', [])
 
 provide(excludedCalendarsKey, excludedCalendars)
 
-const firstWeekday = useLocalStorage('first_weekday', 0)
 // Probably won't work correctly but leaving just in case I want to add the feature
 
 const isGothicScriptWithNumerals = computed(() =>
@@ -214,10 +214,9 @@ const viewDate = computed(() =>
   }
   else if (calendarView.value == "week")
   {
-    const newDate = modDate(referenceDate.value, {h: null})
-    newDate.setUTCDate(newDate.getUTCDate()
-      - ((newDate.getUTCDay() - options.value.firstWeekday + 7) % 7))
-    return newDate
+    return modDate(
+      getFirstDayOfWeek(referenceDate.value, options.value.firstWeekday),
+      {h: null})
   }
 
   return referenceDate.value
@@ -323,23 +322,20 @@ function goCurrent()
 
 function goDirection(value: number)
 {
-  const newDate = new Date(referenceDate.value)
   if (calendarView.value == "month")
   {
-    newDate.setUTCMonth(newDate.getUTCMonth() + value)
-    newDate.setUTCDate(1)
+    setDate(modDate(referenceDate.value, { d: null, _m: value }))
   }
   else if (calendarView.value == "year")
   {
-    newDate.setUTCFullYear(newDate.getUTCFullYear() + value)
-    newDate.setUTCMonth(0)
-    newDate.setUTCDate(1)
+    setDate(modDate(referenceDate.value, { m: null, _y: value }))
   }
   else if (calendarView.value == "week")
   {
-    newDate.setUTCDate((newDate.getUTCDate() - (newDate.getUTCDay())) + (7 * value))
+    setDate(modDate(
+      getFirstDayOfWeek(referenceDate.value, options.value.firstWeekday),
+      { h: null, _d: 7 * value }))
   }
-  setDate(newDate)
 }
 
 function goBack()

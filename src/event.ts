@@ -223,7 +223,6 @@ class MethodLunarYearly extends CachedYearMethod<LunarMonth[]> implements Schedu
         return m == (lunarMonth.index + leapShift) + 1
       })
       if (!lunarMonth) return
-      console.log('hey')
       const date = modDate(lunarMonth.start, {_d: d-1})
       if (!(date < lunarMonth.end)) return
       dates.push(date)

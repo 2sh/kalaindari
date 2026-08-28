@@ -73,7 +73,7 @@ function getDays()
     const events = getEvents(date)
     const isToday = sameTime(date, new Date(), 'd')
 
-    if (date.getUTCDay() == 0)
+    if (date.getUTCDay() == options.value.firstWeekday)
       isNewWeek = true
 
     if (props.compact && !(isToday || events.length)) continue

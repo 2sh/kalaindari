@@ -90,3 +90,18 @@ export function getDaysInMonth(date: Date)
 {
   return diffInDays(date, modDate(date, {_m: 1}))
 }
+
+export function getFirstDayOfWeek(date: Date, firstDow: number)
+{
+  const d = new Date(date)
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - firstDow + 7) % 7))
+  return d
+}
+
+export function getNumberOfWeeksInMonth(date: Date, firstDow: number)
+{
+  const start = getFirstDayOfWeek(date, firstDow)
+  const end = new Date(date)
+  end.setUTCMonth(end.getUTCMonth()+1)
+  return Math.ceil(diffInDays(start, end) / 7)
+}

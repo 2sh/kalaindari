@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { modDate, diffInDays, sameTime } from '@/tools'
+import { modDate, diffInDays, sameTime, getFirstDayOfWeek, getNumberOfWeeksInMonth } from '@/tools'
 import type {
   CalendarEvent,
   Options,
@@ -20,22 +20,13 @@ const options = inject(optionsKey) as Ref<Options>
 const props = defineProps<PropsGrid>()
 
 const firstOfGrid = computed(() =>
-{
-  const d = new Date(props.gridMonth)
-  d.setUTCDate(1 - ((d.getUTCDay() - options.value.firstWeekday + 7) % 7))
-  return d
-})
-
-function getWeeksInMonth()
-{
-  const d = new Date(props.gridMonth)
-  d.setUTCMonth(d.getUTCMonth()+1)
-  return Math.ceil(diffInDays(firstOfGrid.value, d) / 7)
-}
+  getFirstDayOfWeek(props.gridMonth, options.value.firstWeekday))
 
 const weeksInGrid = computed(() =>
 {
-  return props.hideUnusedWeeks ? getWeeksInMonth() : 6
+  return props.hideUnusedWeeks
+    ? getNumberOfWeeksInMonth(props.gridMonth, options.value.firstWeekday)
+    : 6
 })
 
 const lastOfGrid = computed(() =>
